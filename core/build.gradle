@@ -42,28 +42,28 @@ extraJavaModuleInfo {
 }
 
 dependencies {
-    implementation 'org.commonmark:commonmark:0.21.0'
-    implementation 'org.slf4j:slf4j-api:2.0.12'
-    implementation 'ch.qos.logback:logback-classic:1.5.0'
-    implementation 'org.apache.commons:commons-lang3:3.12.0'
+    implementation 'org.commonmark:commonmark:0.27.0'
+    implementation 'org.slf4j:slf4j-api:2.0.17'
+    implementation 'ch.qos.logback:logback-classic:1.5.20'
+    implementation 'org.apache.commons:commons-lang3:3.19.0'
     implementation 'com.google.inject:guice:7.0.0'
-    implementation 'com.opencsv:opencsv:5.7.1'
+    implementation 'com.opencsv:opencsv:5.12.0'
     implementation 'org.graalvm.sdk:graal-sdk:23.0.3'
     implementation 'org.graalvm.js:js-scriptengine:23.0.3'
     implementation 'org.graalvm.js:js:23.0.3'
     implementation 'org.graalvm.truffle:truffle-api:23.0.3'
-    implementation 'com.ibm.icu:icu4j:71.2'
+    implementation 'com.ibm.icu:icu4j:78.1'
     implementation files('libs/script-api-1.0.jar')
-    implementation 'io.github.classgraph:classgraph:4.8.165'
-    implementation 'org.locationtech.jts:jts-core:1.19.0'
+    implementation 'io.github.classgraph:classgraph:4.8.184'
+    implementation 'org.locationtech.jts:jts-core:1.20.0'
 
     implementation 'de.javagl:obj:0.4.0'
 
-    implementation 'org.ow2.asm:asm:9.7.1'
-    implementation 'org.ow2.asm:asm-commons:9.7.1'
+    implementation 'org.ow2.asm:asm:9.9'
+    implementation 'org.ow2.asm:asm-commons:9.9'
 
-    implementation 'jakarta.activation:jakarta.activation-api:2.1.2'
-    implementation 'org.glassfish.jaxb:jaxb-runtime:4.0.5'
+    implementation 'jakarta.activation:jakarta.activation-api:2.1.4'
+    implementation 'org.glassfish.jaxb:jaxb-runtime:4.0.6'
     implementation 'org.glassfish:jakarta.json:2.0.1'
     implementation 'org.eclipse:yasson:2.0.1'
 }
