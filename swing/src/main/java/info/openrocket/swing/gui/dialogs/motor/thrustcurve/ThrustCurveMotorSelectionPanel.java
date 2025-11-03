@@ -342,9 +342,10 @@ public class ThrustCurveMotorSelectionPanel extends JPanel implements MotorSelec
 				}
 			});
 
-			JScrollPane scrollpane = new JScrollPane(table);
-			scrollpane.setMinimumSize(new Dimension(0, 0));
-			panel.add(scrollpane, "grow, pushx, pushy, width :500:, spanx, wrap");
+		JScrollPane scrollpane = new JScrollPane(table);
+		scrollpane.setMinimumSize(new Dimension(0, 0));
+		scrollpane.setPreferredSize(new Dimension(500, 150));
+		panel.add(scrollpane, "grow, pushx, pushy, width :500:, height 80::, spanx, wrap");
 
 		}
 
