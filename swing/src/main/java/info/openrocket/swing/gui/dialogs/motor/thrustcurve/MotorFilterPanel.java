@@ -180,7 +180,8 @@ public abstract class MotorFilterPanel extends JPanel {
 		JScrollPane manufacturerScrollPane = new JScrollPane(manufacturerCheckList.getList());
 		//manufacturerScrollPane.setMinimumSize(new Dimension(20, 10));
 		manufacturerScrollPane.setMinimumSize(new Dimension(0, 0));
-		sub.add(manufacturerScrollPane, "grow, pushy, growprio 200, hmin 1, wrap");
+		manufacturerScrollPane.setPreferredSize(new Dimension(60, 60));
+		sub.add(manufacturerScrollPane, "grow, pushy, growprio 200, wrap");
 
 		JButton clearMotors = new JButton(trans.get("TCMotorSelPan.btn.checkNone"));
 		clearMotors.addActionListener(new ActionListener() {
