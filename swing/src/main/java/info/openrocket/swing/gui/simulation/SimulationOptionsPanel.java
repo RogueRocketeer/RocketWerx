@@ -27,6 +27,7 @@ import javax.swing.SwingUtilities;
 import info.openrocket.core.document.OpenRocketDocument;
 import info.openrocket.core.document.Simulation;
 import info.openrocket.core.l10n.Translator;
+import info.openrocket.core.models.gravity.GravityModelType;
 import info.openrocket.core.simulation.RK4SimulationStepper;
 import info.openrocket.core.simulation.SimulationOptions;
 import info.openrocket.core.simulation.extension.SimulationExtension;
@@ -65,6 +66,11 @@ class SimulationOptionsPanel extends JPanel {
 	private JPanel currentExtensions;
 	final JPopupMenu extensionMenu;
 	JMenu extensionMenuCopyExtension;
+
+	private JSpinner gravitySpinner;
+	private UnitSelector gravityUnit;
+	private BasicSlider gravitySlider;
+	private JLabel gravityLabel;
 
 	private static Color textColor;
 	private static Color dimTextColor;
@@ -156,7 +162,69 @@ class SimulationOptionsPanel extends JPanel {
 		};
 		gcsCombo.addActionListener(gcsTTipListener);
 		gcsTTipListener.actionPerformed(null);
-		subsub.add(gcsCombo, "span 3, wrap para");
+		subsub.add(gcsCombo, "span 3, wrap");
+		
+		// // Gravity model:
+		label = new JLabel(trans.get("simedtdlg.lbl.GravityModel"));
+		label.setToolTipText(trans.get("simedtdlg.lbl.ttip.GravityModel"));
+		subsub.add(label, "gapright para");
+		
+		EnumModel<GravityModelType> gravityModelTypeModel = new EnumModel<>(
+				conditions, "GravityModelType");
+		final JComboBox<GravityModelType> gravityModelCombo = new JComboBox<>(gravityModelTypeModel);
+		
+		// Update tooltip based on selected gravity model type
+		ActionListener gravityModelTTipListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				GravityModelType selectedType = (GravityModelType) gravityModelCombo.getSelectedItem();
+				if (selectedType == GravityModelType.WGS) {
+					gravityModelCombo.setToolTipText(trans.get("simedtdlg.GravityModel.WGS84.ttip"));
+				} else if (selectedType == GravityModelType.CONSTANT) {
+					gravityModelCombo.setToolTipText(trans.get("simedtdlg.GravityModel.Constant.ttip"));
+				}
+			}
+		};
+		gravityModelCombo.addActionListener(gravityModelTTipListener);
+		gravityModelTTipListener.actionPerformed(null);
+		subsub.add(gravityModelCombo, "span 3, wrap");
+		
+		// // Constant gravity value:
+		gravityLabel = new JLabel(trans.get("simedtdlg.lbl.GravityValue"));
+		tip = trans.get("simedtdlg.lbl.ttip.GravityValue");
+		gravityLabel.setToolTipText(tip);
+		subsub.add(gravityLabel, "gapright para, hidemode 3");
+		
+		m = new DoubleModel(conditions, "ConstantGravity", UnitGroup.UNITS_ACCELERATION, 0);
+		
+		gravitySpinner = new JSpinner(m.getSpinnerModel());
+		gravitySpinner.setEditor(new SpinnerEditor(gravitySpinner));
+		gravitySpinner.setToolTipText(tip);
+		subsub.add(gravitySpinner, "hidemode 3");
+		
+		gravityUnit = new UnitSelector(m);
+		gravityUnit.setToolTipText(tip);
+		subsub.add(gravityUnit, "hidemode 3");
+		gravitySlider = new BasicSlider(m.getSliderModel(0, 20));
+		gravitySlider.setToolTipText(tip);
+		subsub.add(gravitySlider, "w 100, hidemode 3, wrap");
+		
+		// Update visibility of constant gravity components based on selected model
+		ActionListener gravityModelListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				GravityModelType selectedType = (GravityModelType) gravityModelCombo.getSelectedItem();
+				boolean isConstant = selectedType == GravityModelType.CONSTANT;
+				gravityLabel.setVisible(isConstant);
+				gravitySpinner.setVisible(isConstant);
+				gravityUnit.setVisible(isConstant);
+				gravitySlider.setVisible(isConstant);
+				subsub.revalidate();
+				subsub.repaint();
+			}
+		};
+		gravityModelCombo.addActionListener(gravityModelListener);
+		gravityModelListener.actionPerformed(null); // Initialize visibility
 		
 		
 		// // Time step:
@@ -168,7 +236,7 @@ class SimulationOptionsPanel extends JPanel {
 						.toStringUnit(RK4SimulationStepper.RECOMMENDED_TIME_STEP)
 				+ ".";
 		label.setToolTipText(tip);
-		subsub.add(label, "gapright para");
+		subsub.add(label, "gaptop para, gapright para");
 		
 		m = new DoubleModel(conditions, "TimeStep", UnitGroup.UNITS_TIME_STEP,
 				0.01, 1);

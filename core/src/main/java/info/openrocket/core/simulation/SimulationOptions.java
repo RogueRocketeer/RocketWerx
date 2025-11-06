@@ -23,7 +23,9 @@ import info.openrocket.core.aerodynamics.BarrowmanCalculator;
 import info.openrocket.core.masscalc.MassCalculator;
 import info.openrocket.core.models.atmosphere.AtmosphericModel;
 import info.openrocket.core.models.atmosphere.ExtendedISAModel;
+import info.openrocket.core.models.gravity.ConstantGravityModel;
 import info.openrocket.core.models.gravity.GravityModel;
+import info.openrocket.core.models.gravity.GravityModelType;
 import info.openrocket.core.models.gravity.WGSGravityModel;
 import info.openrocket.core.models.wind.PinkNoiseWindModel;
 import info.openrocket.core.startup.Application;
@@ -84,6 +86,9 @@ public class SimulationOptions implements ChangeSource, Cloneable, SimulationOpt
 	private WindModelType windModelType = WindModelType.AVERAGE;
 	private PinkNoiseWindModel averageWindModel;
 	private MultiLevelPinkNoiseWindModel multiLevelPinkNoiseWindModel;
+
+	private GravityModelType gravityModelType = preferences.getGravityModel();
+	private double constantGravity = preferences.getConstantGravityValue();
 
 	private SimulationStepperMethod stepperMethodChoice = SimulationStepperMethod.RK4;
 
@@ -158,6 +163,28 @@ public class SimulationOptions implements ChangeSource, Cloneable, SimulationOpt
 			this.windModelType = windModelType;
 			fireChangeEvent();
 		}
+	}
+
+	public GravityModelType getGravityModelType() {
+		return gravityModelType;
+	}
+
+	public void setGravityModelType(GravityModelType gravityModelType) {
+		if (this.gravityModelType != gravityModelType) {
+			this.gravityModelType = gravityModelType;
+			fireChangeEvent();
+		}
+	}
+
+	public double getConstantGravity() {
+		return constantGravity;
+	}
+
+	public void setConstantGravity(double constantGravity) {
+		if (MathUtil.equals(this.constantGravity, constantGravity))
+			return;
+		this.constantGravity = constantGravity;
+		fireChangeEvent();
 	}
 
 	public WindModel getWindModel() {
@@ -450,6 +477,15 @@ public class SimulationOptions implements ChangeSource, Cloneable, SimulationOpt
 			this.multiLevelPinkNoiseWindModel.loadFrom(src.multiLevelPinkNoiseWindModel);
 		}
 
+		if (this.gravityModelType != src.gravityModelType) {
+			isChanged = true;
+			this.gravityModelType = src.gravityModelType;
+		}
+		if (this.constantGravity != src.constantGravity) {
+			isChanged = true;
+			this.constantGravity = src.constantGravity;
+		}
+
 		if (this.launchAltitude != src.launchAltitude) {
 			isChanged = true;
 			this.launchAltitude = src.launchAltitude;
@@ -539,7 +575,9 @@ public class SimulationOptions implements ChangeSource, Cloneable, SimulationOpt
 				MathUtil.equals(this.maxSimulationTime, o.maxSimulationTime)) &&
 				this.windModelType == o.windModelType &&
 				this.averageWindModel.equals(o.averageWindModel) &&
-				this.multiLevelPinkNoiseWindModel.equals(o.multiLevelPinkNoiseWindModel);
+				this.multiLevelPinkNoiseWindModel.equals(o.multiLevelPinkNoiseWindModel) &&
+				this.gravityModelType == o.gravityModelType &&
+				MathUtil.equals(this.constantGravity, o.constantGravity);
 	}
 
 	/**
@@ -591,7 +629,15 @@ public class SimulationOptions implements ChangeSource, Cloneable, SimulationOpt
 		WindModel windModel = getWindModel().clone();
 		conditions.setWindModel(windModel);
 		conditions.setAtmosphericModel(getAtmosphericModel());
-		GravityModel gravityModel = new WGSGravityModel();
+		
+		GravityModel gravityModel;
+		if (gravityModelType == GravityModelType.WGS) {
+			gravityModel = new WGSGravityModel();
+		} else if (gravityModelType == GravityModelType.CONSTANT) {
+			gravityModel = new ConstantGravityModel(constantGravity);
+		} else {
+			throw new IllegalArgumentException("Unknown gravity model type: " + gravityModelType);
+		}
 		conditions.setGravityModel(gravityModel);
 
 		conditions.setAerodynamicCalculator(new BarrowmanCalculator());

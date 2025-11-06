@@ -17,6 +17,7 @@ import info.openrocket.core.logging.ErrorSet;
 import info.openrocket.core.logging.SimulationAbort;
 import info.openrocket.core.logging.WarningSet;
 import info.openrocket.core.material.Material;
+import info.openrocket.core.models.gravity.GravityModelType;
 import info.openrocket.core.models.wind.MultiLevelPinkNoiseWindModel;
 import info.openrocket.core.models.wind.WindModel;
 import info.openrocket.core.preferences.DocumentPreferences;
@@ -385,6 +386,17 @@ public class OpenRocketSaver extends RocketSaver {
 			writeElement("basepressure", cond.getLaunchPressure());
 			indent--;
 			writeln("</atmosphere>");
+		}
+		
+		// Gravity model
+		if (cond.getGravityModelType() == GravityModelType.WGS) {
+			writeln("<gravity model=\"wgs\"/>");
+		} else if (cond.getGravityModelType() == GravityModelType.CONSTANT) {
+			writeln("<gravity model=\"constant\">");
+			indent++;
+			writeElement("value", cond.getConstantGravity());
+			indent--;
+			writeln("</gravity>");
 		}
 		
 		writeElement("timestep", cond.getTimeStep());

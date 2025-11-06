@@ -19,6 +19,7 @@ import info.openrocket.core.file.wavefrontobj.export.OBJExportOptions;
 import info.openrocket.core.material.Material;
 import info.openrocket.core.models.atmosphere.AtmosphericModel;
 import info.openrocket.core.models.atmosphere.ExtendedISAModel;
+import info.openrocket.core.models.gravity.GravityModelType;
 import info.openrocket.core.models.wind.PinkNoiseWindModel;
 import info.openrocket.core.preset.ComponentPreset;
 import info.openrocket.core.rocketcomponent.FlightConfiguration;
@@ -147,6 +148,8 @@ public abstract class ApplicationPreferences implements ChangeSource, ORPreferen
 	public static final String SIMULATION_TIME_STEP = "SimulationTimeStep";
 	public static final String SIMULATION_MAX_TIME = "SimulationMaxTime";
 	public static final String GEODETIC_COMPUTATION = "GeodeticComputationStrategy";
+	public static final String GRAVITY_MODEL = "GravityModel";
+	public static final String CONSTANT_GRAVITY_VALUE = "ConstantGravityValue";
 	public static final String SIMULATION_STEPPER_METHOD = "SimulationStepperMethod";
 
 	public static final String UI_THEME = "UITheme";
@@ -583,6 +586,25 @@ public abstract class ApplicationPreferences implements ChangeSource, ORPreferen
 
 	public void setGeodeticComputation(GeodeticComputationStrategy gcs) {
 		this.putEnum(GEODETIC_COMPUTATION, gcs);
+	}
+
+	public GravityModelType getGravityModel() {
+		return this.getEnum(GRAVITY_MODEL, GravityModelType.WGS);
+	}
+
+	public void setGravityModel(GravityModelType gmt) {
+		this.putEnum(GRAVITY_MODEL, gmt);
+	}
+
+	public double getConstantGravityValue() {
+		return this.getDouble(CONSTANT_GRAVITY_VALUE, 9.807);
+	}
+
+	public void setConstantGravityValue(double value) {
+		if (MathUtil.equals(this.getDouble(CONSTANT_GRAVITY_VALUE, 9.807), value))
+			return;
+		this.putDouble(CONSTANT_GRAVITY_VALUE, value);
+		fireChangeEvent();
 	}
 
 	public SimulationStepperMethod getSimulationStepperMethodChoice() {
