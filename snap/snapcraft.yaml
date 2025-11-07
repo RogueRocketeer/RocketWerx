@@ -15,6 +15,18 @@ architectures:
   - build-on: [s390x]
   #- build-on: [riscv64]
 
+plugs:
+  dot-java-user-prefs-openrocket:
+    interface: personal-files
+    read:
+      - $HOME/.java/.userPrefs/OpenRocket
+  dot-openrocket:
+    interface: personal-files
+    read:
+      - $HOME/.openrocket
+    write:
+      - $HOME/.openrocket
+
 apps:
   openrocket:
     command: bin/launcher
@@ -86,7 +98,7 @@ parts:
       esac
 
       # Build
-      ./gradlew --no-daemon -g "$GRADLE_USER_HOME" clean jar
+      ./gradlew --no-daemon -g "$GRADLE_USER_HOME" clean shadowJar
 
       # Pick jar
       JAR="$(ls -1 build/libs/OpenRocket-*.jar | head -n1)"

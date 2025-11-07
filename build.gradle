@@ -51,6 +51,7 @@ def baseManifestAttributes = [
         'Implementation-Vendor': 'OpenRocket',
         'Implementation-Vendor-Id': 'info.openrocket',
         'Implementation-URL'   : 'https://openrocket.info/',
+        'Main-Class'           : application.mainClass.get(),
 ]
 
 // JaCoCo configuration

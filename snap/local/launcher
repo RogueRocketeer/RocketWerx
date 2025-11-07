@@ -23,7 +23,7 @@ esac
 # Note, $HOME is remapped within a snap so it is necessary to use
 # SNAP_REAL_HOME instead.
 #
-if snapctl is-connected dot-java-user-prefs-openrocket; then
+if snapctl is-connected dot-java-user-prefs-openrocket 2>/dev/null; then
     SRC_PREFS=$SNAP_REAL_HOME/.java/.userPrefs/OpenRocket
     TGT_PREFS=$SNAP_USER_COMMON/.java/.userPrefs/
     if [[ -d $SRC_PREFS && ! -d "$TGT_PREFS" ]]; then
@@ -41,7 +41,7 @@ fi
 # user prefs dir. So we'll force it to use the snap.
 JAVA_OPTS="$JAVA_OPTS -Djava.util.prefs.userRoot=$SNAP_USER_COMMON/"
 
-if ! snapctl is-connected dot-openrocket; then
+if ! snapctl is-connected dot-openrocket 2>/dev/null; then
     JAVA_OPTS="$JAVA_OPTS -Duser.home=$SNAP_USER_COMMON/"
 fi
 
