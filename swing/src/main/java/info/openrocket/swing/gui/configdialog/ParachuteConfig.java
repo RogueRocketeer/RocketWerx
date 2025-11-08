@@ -54,11 +54,11 @@ public class ParachuteConfig extends RecoveryDeviceConfig {
 		Parachute parachute = (Parachute) component;
 
 		// Left Side
-		JPanel primary = new JPanel(new MigLayout());
-		JPanel panel = new JPanel(new MigLayout("gap rel unrel, ins 0", "[][65lp::][30lp::][]", ""));
+		JPanel primary = new JPanel(new MigLayout("fill, ins n n 0 n"));
+		JPanel panel = new JPanel(new MigLayout("fillx, gap rel unrel, ins 0", "[][65lp::][30lp::][]", ""));
 
 		// ---------------------------- Canopy ----------------------------
-		JPanel canopyPanel = new JPanel(new MigLayout("gap rel unrel", "[][65lp::][30lp::][]"));
+		JPanel canopyPanel = new JPanel(new MigLayout("fill, gap rel unrel", "[][65lp::][30lp::][]"));
 		canopyPanel.setBorder(BorderFactory.createTitledBorder(trans.get("ParachuteCfg.lbl.Canopy")));
 
 		//// Diameter:
@@ -131,11 +131,11 @@ public class ParachuteConfig extends RecoveryDeviceConfig {
 		canopyPanel.add(button, "spanx");
 		order.add(button);
 
-		panel.add(canopyPanel, "spanx, growx, wrap 10lp");
+		panel.add(canopyPanel, "spanx, grow, wrap 10lp");
 
 
 		//  ---------------------------- Shroud lines ----------------------------
-		JPanel shroudPanel = new JPanel(new MigLayout("gap rel unrel", "[][65lp::][30lp::][]"));
+		JPanel shroudPanel = new JPanel(new MigLayout("fill, gap rel unrel", "[][65lp::][30lp::][]"));
 		shroudPanel.setBorder(BorderFactory.createTitledBorder(trans.get("ParachuteCfg.lbl.Shroudlines")));
 
 		//// Number of lines:
@@ -170,11 +170,11 @@ public class ParachuteConfig extends RecoveryDeviceConfig {
 		shroudPanel.add(shroudMaterialCombo, "spanx, growx");
 		order.add(shroudMaterialCombo);
 
-		panel.add(shroudPanel, "spanx, wrap");
+		panel.add(shroudPanel, "spanx, grow, wrap");
 		primary.add(panel, "grow, gapright 20lp");
 
 		// Right side
-		panel = new JPanel(new MigLayout("gap rel unrel, ins 0", "[][65lp::][30lp::][]", ""));
+		panel = new JPanel(new MigLayout("fillx, gap rel unrel, ins 0", "[][65lp::][30lp::][]", ""));
 
 		{// ---------------------------- Placement ----------------------------
 			//// Position relative to:
@@ -226,7 +226,7 @@ public class ParachuteConfig extends RecoveryDeviceConfig {
 		}
 
 		{// ---------------------------- Deployment ----------------------------
-			JPanel deploymentPanel = new JPanel(new MigLayout("gap rel unrel", "[][65lp::][30lp::][]"));
+			JPanel deploymentPanel = new JPanel(new MigLayout("fill", "[][65lp::][30lp::][]"));
 			deploymentPanel.setBorder(BorderFactory.createTitledBorder(trans.get("ParachuteCfg.lbl.Deployment")));
 
 			//// Deploys at:

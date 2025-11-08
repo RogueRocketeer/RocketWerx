@@ -33,7 +33,7 @@ public class PlacementPanel extends JPanel implements Invalidatable, Invalidatin
     private final List<Invalidatable> invalidatables = new ArrayList<>();
 
     public PlacementPanel(RocketComponent component, List<Component> order) {
-        super(new MigLayout("gap rel unrel", "[][65lp::][30lp::]"));
+        super(new MigLayout("fill, gap rel unrel", "[][65lp::][30lp::]"));
         this.setBorder(BorderFactory.createTitledBorder(trans.get("PlacementPanel.title.Placement")));
 
         this.add(new JLabel(trans.get("PlacementPanel.lbl.PosRelativeTo")));
