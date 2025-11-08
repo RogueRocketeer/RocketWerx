@@ -1,9 +1,8 @@
 plugins {
-    id 'com.github.johnrengelman.shadow'
     id 'java'
     id 'checkstyle'
-    id 'com.adarshr.test-logger' version '3.2.0'
-    id 'org.gradlex.extra-java-module-info' version '1.8'
+    id 'com.adarshr.test-logger' version '4.0.0'
+    id 'org.gradlex.extra-java-module-info' version '1.13.1'
 }
 
 java {
@@ -37,35 +36,36 @@ configurations {
 
 // Some older libraries are not modularized, so we need to add module-info.java files for them.
 extraJavaModuleInfo {
-    failOnMissingModuleInfo.set(false)
+    failOnMissingModuleInfo = false
+    skipLocalJars = true
     automaticModule('obj-0.4.0.jar', 'de.javagl.obj')
 }
 
 dependencies {
-    implementation group: 'org.commonmark', name: 'commonmark', version: '0.21.0'
-    implementation group: 'org.slf4j', name: 'slf4j-api', version: '2.0.12'
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.0'
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.12.0'
-    implementation group: 'com.google.inject', name: 'guice', version: '7.0.0'
-    implementation group: 'com.opencsv', name: 'opencsv', version: '5.7.1'
-    implementation group: 'org.graalvm.sdk', name: 'graal-sdk', version: '23.0.3'
-    implementation group: 'org.graalvm.js', name: 'js-scriptengine', version: '23.0.3'
-    implementation group: 'org.graalvm.js', name: 'js', version: '23.0.3'
-    implementation group: 'org.graalvm.truffle', name: 'truffle-api', version: '23.0.3'
-    implementation group: 'com.ibm.icu', name: 'icu4j', version: '71.2'
+    implementation 'org.commonmark:commonmark:0.27.0'
+    implementation 'org.slf4j:slf4j-api:2.0.17'
+    implementation 'ch.qos.logback:logback-classic:1.5.20'
+    implementation 'org.apache.commons:commons-lang3:3.19.0'
+    implementation 'com.google.inject:guice:7.0.0'
+    implementation 'com.opencsv:opencsv:5.12.0'
+    implementation 'org.graalvm.sdk:graal-sdk:23.0.3'
+    implementation 'org.graalvm.js:js-scriptengine:23.0.3'
+    implementation 'org.graalvm.js:js:23.0.3'
+    implementation 'org.graalvm.truffle:truffle-api:23.0.3'
+    implementation 'com.ibm.icu:icu4j:78.1'
     implementation files('libs/script-api-1.0.jar')
-    implementation group: 'io.github.classgraph', name: 'classgraph', version: '4.8.165'
-    implementation group: 'org.locationtech.jts', name: 'jts-core', version: '1.19.0'
+    implementation 'io.github.classgraph:classgraph:4.8.184'
+    implementation 'org.locationtech.jts:jts-core:1.20.0'
 
     implementation 'de.javagl:obj:0.4.0'
 
-    implementation group: 'org.ow2.asm', name: 'asm', version: '9.7.1'
-    implementation group: 'org.ow2.asm', name: 'asm-commons', version: '9.7.1'
+    implementation 'org.ow2.asm:asm:9.9'
+    implementation 'org.ow2.asm:asm-commons:9.9'
 
-    implementation group: 'jakarta.activation', name: 'jakarta.activation-api', version: '2.1.2'
-    implementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '4.0.5'
-    implementation group: 'org.glassfish', name: 'jakarta.json', version: '2.0.1'
-    implementation group: 'org.eclipse', name: 'yasson', version: '2.0.1'
+    implementation 'jakarta.activation:jakarta.activation-api:2.1.4'
+    implementation 'org.glassfish.jaxb:jaxb-runtime:4.0.6'
+    implementation 'org.glassfish:jakarta.json:2.0.1'
+    implementation 'org.eclipse:yasson:2.0.1'
 }
 
 def serializedEnginesPath = './src/main/resources/datafiles/thrustcurves/thrustcurves.ser'
@@ -132,10 +132,10 @@ tasks.register('serializeEnginesValidate') {
     if (!project.file(serializedEnginesPath).exists()) {
         def message = "The serialized engine file does not exist at the following location:\n${project.file(serializedEnginesPath)}.\n" +
                 "You will need to run the following from the command line in order to generate the serialized engine file:\n"
-                "% ./gradlew serializeEngines\n" +
+        "% ./gradlew serializeEngines\n" +
                 "\n";
-            println message
-            throw new GradleException('Invalid serialized engine file.')
+        println message
+        throw new GradleException('Invalid serialized engine file.')
     } else {
         def message = "Serialized engine file found.\n\n";
         println message
@@ -227,6 +227,17 @@ tasks.register('externalComponentsValidate') {
         }
     } else {
         println "Found external components"
+    }
+}
+
+jacocoTestCoverageVerification {
+    dependsOn jacocoTestReport
+    violationRules {
+        rule {
+            limit {
+                minimum = 0.6
+            }
+        }
     }
 }
 

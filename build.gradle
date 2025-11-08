@@ -1,9 +1,12 @@
+import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+
 plugins {
-    id 'com.github.johnrengelman.shadow' version '8.1.1'
+    id 'com.gradleup.shadow' version '9.2.2'
     id 'java'
     id 'checkstyle'
-    id 'org.javamodularity.moduleplugin' version '1.8.15'
+    id 'org.javamodularity.moduleplugin' version '2.0.0'
     id 'application'
+    id 'jacoco'
 }
 
 // Java settings
@@ -41,6 +44,21 @@ file('core/src/main/resources/build.properties').withInputStream { buildProperti
 group = 'info.openrocket'
 version = buildProperties['build.version']
 
+def baseManifestAttributes = [
+        'Description'          : 'Model-rocketry aerodynamics and trajectory simulation software',
+        'SplashScreen-Image'   : 'pix/splashscreen.png',
+        'Implementation-Version': buildProperties['build.version'],
+        'Implementation-Vendor': 'OpenRocket',
+        'Implementation-Vendor-Id': 'info.openrocket',
+        'Implementation-URL'   : 'https://openrocket.info/',
+        'Main-Class'           : application.mainClass.get(),
+]
+
+// JaCoCo configuration
+jacoco {
+    toolVersion = "0.8.11"
+}
+
 // Common project configuration
 allprojects {
     repositories {
@@ -53,6 +71,7 @@ allprojects {
 subprojects {
     apply plugin: 'java'
     apply plugin: "org.javamodularity.moduleplugin"
+    apply plugin: 'jacoco'
 
     // Configure the gradle-modules-plugin
     modularity {
@@ -62,6 +81,7 @@ subprojects {
 
     test {
         useJUnitPlatform()
+        finalizedBy jacocoTestReport
 
         testLogging {
             events 'PASSED', 'FAILED', 'SKIPPED', 'STANDARD_OUT'
@@ -71,18 +91,37 @@ subprojects {
         }
     }
 
+    jacocoTestReport {
+        dependsOn test
+        reports {
+            xml.required = true
+            html.required = true
+            csv.required = false
+        }
+    }
+
+    // Always evaluate coverage as part of the verification lifecycle
+    tasks.named('check') {
+        dependsOn jacocoTestCoverageVerification
+    }
+
     // Common dependencies
     dependencies {
-        implementation group: 'jakarta.xml.bind', name: 'jakarta.xml.bind-api', version: '4.0.2'
+        implementation 'jakarta.xml.bind:jakarta.xml.bind-api:4.0.4'
 
-        testImplementation group: 'org.junit.platform', name: 'junit-platform-runner', version: '1.10.2'
-        testImplementation group: 'org.junit.platform', name: 'junit-platform-launcher', version: '1.10.2'
-        testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.10.0'
-        testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.10.0'
-        testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.10.0'
-        testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.10.0'
-        testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.10.0'
+        testImplementation 'org.junit.platform:junit-platform-runner:1.14.1'
+        testImplementation 'org.junit.platform:junit-platform-launcher:6.0.1'
+        testImplementation 'org.junit.jupiter:junit-jupiter-api:6.0.1'
+        testImplementation 'org.junit.jupiter:junit-jupiter-engine:6.0.1'
+        testImplementation 'org.junit.jupiter:junit-jupiter-params:6.0.1'
+
+        testImplementation 'org.mockito:mockito-core:5.10.0'
+        testImplementation 'org.mockito:mockito-junit-jupiter:5.10.0'
     }
+}
+
+tasks.named('check') {
+    dependsOn(subprojects.collect { it.tasks.named('check') })
 }
 
 //tasks.register('serializeEngines') {
@@ -91,21 +130,10 @@ subprojects {
 
 // JAR config
 jar {
-    archiveBaseName.set('OpenRocket')
+    archiveBaseName = 'OpenRocket'
 
     manifest {
-        attributes (
-            'Description': 'Model-rocketry aerodynamics and trajectory simulation software',
-            'SplashScreen-Image': 'pix/splashscreen.png',
-
-            // Versioning
-            'Implementation-Version': buildProperties['build.version'],
-
-            // Vendor Details
-            'Implementation-Vendor': 'OpenRocket',
-            'Implementation-Vendor-Id': 'info.openrocket',
-            'Implementation-URL': 'https://openrocket.info/',
-        )
+        attributes(baseManifestAttributes)
     }
 }
 
@@ -115,32 +143,47 @@ dependencies {
     implementation(project(path: ":swing", configuration: "default"))
 }
 
-shadowJar {
+tasks.named('shadowJar', ShadowJar) {
     dependsOn(':core:processResources')
-    archiveBaseName.set('OpenRocket')
-    archiveVersion.set(buildProperties['build.version'])
-    archiveClassifier.set('')
+    archiveBaseName = 'OpenRocket'
+    archiveVersion = '' + version
+    archiveClassifier = ''
     dependsOn(distTar, distZip)
 
     manifest {
-        from jar.manifest
+        attributes(baseManifestAttributes)
         attributes(
-                'Description': 'Model-rocketry aerodynamics and trajectory simulation software',
-                'SplashScreen-Image': 'pix/splashscreen.png',
-                'Implementation-Version': buildProperties['build.version'],
-                'Implementation-Vendor': 'OpenRocket',
-                'Implementation-Vendor-Id': 'info.openrocket',
-                'Implementation-URL': 'https://openrocket.info/',
                 'Add-Exports': 'java.base/java.lang=ALL-UNNAMED java.desktop/sun.awt=ALL-UNNAMED java.desktop/sun.java2d=ALL-UNNAMED',
                 'JVM-Args': '-Dapple.awt.application.appearance=system -Dsun.java2d.noddraw=true -Dsun.java2d.d3d=false -Dsun.java2d.ddforcevram=true -Dsun.java2d.ddblit=false -Dswing.useflipBufferStrategy=True'
         )
     }
 }
 
+// jacoco aggregate report for all subprojects
+tasks.register('jacocoRootReport', JacocoReport) {
+    group = 'verification'
+    description = 'Generates an aggregate report from all subprojects'
+
+    dependsOn(tasks.named('test'))
+    dependsOn(subprojects.jacocoTestReport)
+
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = false
+    }
+
+    // Collect execution data from all subprojects
+    executionData fileTree(project.rootDir.absolutePath).include("**/build/jacoco/*.exec")
+
+    // Collect class directories from all subprojects
+    classDirectories.setFrom(subprojects.sourceSets.main.output.classesDirs)
+}
+
 // Package the application for distribution.
 tasks.register('dist') {
     group = 'info.openrocket'
-    dependsOn 'shadowJar'
+    dependsOn 'check', 'shadowJar'
     doLast {
         println "Completed the deployable jar in './build/libs"
     }

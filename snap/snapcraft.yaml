@@ -86,7 +86,7 @@ parts:
       esac
 
       # Build
-      ./gradlew --no-daemon -g "$GRADLE_USER_HOME" clean jar
+      ./gradlew --no-daemon -g "$GRADLE_USER_HOME" clean shadowJar
 
       # Pick jar
       JAR="$(ls -1 build/libs/OpenRocket-*.jar | head -n1)"
@@ -95,13 +95,13 @@ parts:
       # Set the version
       BV="$(grep -E '^build\.version=' core/src/main/resources/build.properties | cut -d= -f2)"
       HASH="$(git rev-parse --short=7 HEAD 2>/dev/null || echo 0000000)"
-      
+
       if printf '%s' "$BV" | grep -q 'SNAPSHOT$'; then
       VERSION="${BV%SNAPSHOT}-g${HASH}"     # e.g. 25.xx.-g1a2b3c4
       else
       VERSION="$BV"                         # e.g. 25.12
       fi
-      
+
       # trim and set (max 32 chars)
       VERSION="${VERSION#v}"
       VERSION="${VERSION:0:32}"
