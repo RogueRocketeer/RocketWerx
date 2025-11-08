@@ -291,4 +291,42 @@ public class MathUtilTest {
 		assertEquals(16.0, v, EPS, "Failed to calculate center with longer list");
 
 	}
+
+	@Test
+	public void testSafeSqrtHandlesNegativeInput() {
+		assertEquals(0.0, MathUtil.safeSqrt(-1.0e-6), EPS);
+		assertEquals(5.0, MathUtil.safeSqrt(25.0), EPS);
+	}
+
+	@Test
+	public void testInterpolateHandlesDegenerateSegment() {
+		List<Double> domain = List.of(1.0, 1.0 + MathUtil.EPSILON / 10);
+		List<Double> rising = List.of(0.0, 1.0);
+		List<Double> falling = List.of(0.0, -1.0);
+		List<Double> flat = List.of(1.0, 1.0);
+
+		double t = 1.0 + MathUtil.EPSILON / 20;
+		assertEquals(Double.POSITIVE_INFINITY, MathUtil.interpolate(domain, rising, t));
+		assertEquals(Double.NEGATIVE_INFINITY, MathUtil.interpolate(domain, falling, t));
+		assertEquals(0.0, MathUtil.interpolate(domain, flat, t), EPS);
+	}
+
+	@Test
+	public void testInterpolateSimpleDouble() {
+		assertEquals(7.5, MathUtil.interpolate(5.0, 10.0, 0.5), EPS);
+		assertEquals(10.0, MathUtil.interpolate(5.0, 10.0, 1.0), EPS);
+		assertEquals(5.0, MathUtil.interpolate(5.0, 10.0, 0.0), EPS);
+	}
+
+	@Test
+	public void testAngleConversionsAreConsistent() {
+		assertEquals(Math.PI, MathUtil.deg2rad(180.0), EPS);
+		assertEquals(180.0, MathUtil.rad2deg(Math.PI), EPS);
+		assertEquals(45.0, MathUtil.rad2deg(MathUtil.deg2rad(45.0)), EPS);
+	}
+
+	@Test
+	public void testMapToConstantRangeReturnsConstant() {
+		assertEquals(42.0, MathUtil.map(10.0, 0.0, 100.0, 42.0, 42.0), EPS);
+	}
 }

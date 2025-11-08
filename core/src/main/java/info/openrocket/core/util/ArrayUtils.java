@@ -119,24 +119,29 @@ public class ArrayUtils {
 	}
 
 	/**
-	 * Returns the nearest value in an array to a given value
+	 * Find which element in a uniformly sampled array sits closest to the target
 	 * Search starts from the lowest array index
+	 *
+	 * @param range the array to search
+	 * @param near  the value to find the nearest to
+	 * @param start the starting value corresponding to range[0]
+	 * @param step  the step size between each value in range
+	 * @return the value in the range array nearest to 'near'
 	 */
 	public static double tnear(double[] range, double near, double start, double step) {
+		// TODO: I think this can be rewritten a lot better, without the start and step, and supporting non-uniform arrays
 		double min = Double.POSITIVE_INFINITY;
-		int mini = 0;
+		int minIdx = 0;
 
-		// System.out.println("Nearest to "+near+" in range length "+range.length);
 		for (int i = 0; i < range.length; i++) {
 			double x = Math.abs(range[i] - near);
 			if (x < min) {
 				min = x;
-				mini = i;
+				minIdx = i;
 			}
 		}
 
-		// System.out.println("Found nearest at i="+mini);
-		return start + (mini * step);
+		return start + (minIdx * step);
 	}
 
 	public static <T> T[] copyOf(T[] original, int length) {

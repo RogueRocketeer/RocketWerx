@@ -1,9 +1,15 @@
 package info.openrocket.core.util;
 
-import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import java.nio.DoubleBuffer;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class TestTransformation {
 	static final CoordinateIF x_unit = Coordinate.X_UNIT;
@@ -199,6 +205,65 @@ public class TestTransformation {
 		assertEquals(new Coordinate(3, 3, 4), r.transform(x_unit));
 		assertEquals(new Coordinate(2, 3, 5), r.transform(y_unit));
 		assertEquals(new Coordinate(2, 2, 4), r.transform(z_unit));
+	}
+
+	@Test
+	public void testLinearTransformIgnoresTranslation() {
+		Transformation rotation = Transformation.rotate_z(M_PI_2);
+		Transformation translation = Transformation.getTranslationTransform(5, -3, 2);
+		Transformation composite = translation.applyTransformation(rotation);
+
+		CoordinateIF result = composite.linearTransform(x_unit);
+		assertEquals(rotation.transform(x_unit), result);
+	}
+
+	@Test
+	public void testApplyTransformationMatchesSequentialApplication() {
+		Transformation translate = Transformation.getTranslationTransform(2, 0, 1);
+		Transformation rotate = Transformation.rotate_y(M_PI_2);
+		Transformation combined = rotate.applyTransformation(translate);
+
+		CoordinateIF point = new Coordinate(1, 0, 0);
+		CoordinateIF sequential = rotate.transform(translate.transform(point));
+		CoordinateIF composed = combined.transform(point);
+
+		assertEquals(sequential, composed);
+	}
+
+	@Test
+	public void testRotationAroundOriginKeepsOriginFixed() {
+		Coordinate origin = new Coordinate(2, 3, 4);
+		Transformation rotation = Transformation.getRotationTransform(new Coordinate(0, 0, M_PI_2), origin);
+
+		assertEquals(origin, rotation.transform(origin));
+
+		CoordinateIF point = new Coordinate(3, 3, 4);
+		CoordinateIF rotated = rotation.transform(point);
+
+		assertEquals(new Coordinate(2, 4, 4), rotated);
+	}
+
+	@Test
+	public void testTransformCollectionReplacesElementsInPlace() {
+		List<CoordinateIF> points = new ArrayList<>(Arrays.asList(
+				new Coordinate(1, 0, 0),
+				new Coordinate(0, 1, 0)));
+
+		Transformation rotation = Transformation.rotate_z(M_PI_2);
+		rotation.transform(points);
+
+		assertEquals(new Coordinate(0, 1, 0), points.get(0));
+		assertEquals(new Coordinate(-1, 0, 0), points.get(1));
+	}
+
+	@Test
+	public void testIdentityDetection() {
+		Transformation identityCopy = Transformation.getTranslationTransform(0, 0, 0);
+		assertTrue(identityCopy.isIdentity());
+		assertEquals(Transformation.IDENTITY, identityCopy);
+
+		Transformation translated = Transformation.getTranslationTransform(0, 0, 1);
+		assertFalse(translated.isIdentity());
 	}
 
 }
