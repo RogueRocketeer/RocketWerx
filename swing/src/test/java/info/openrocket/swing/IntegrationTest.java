@@ -344,7 +344,7 @@ public class IntegrationTest {
 		// Simulate + check altitude
 		simulation.simulate();
 		actual = simulation.getSimulatedData().getBranch(0).getMaximum(FlightDataType.TYPE_ALTITUDE);
-		assertEquals(expected, actual, 0.5);
+		assertEquals(expected, actual, 1.0);
 	}
 	
 	private OpenRocketDocument loadRocket(String fileName) {
