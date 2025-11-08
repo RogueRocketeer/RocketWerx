@@ -86,7 +86,7 @@ parts:
       esac
 
       # Build
-      ./gradlew --no-daemon -g "$GRADLE_USER_HOME" clean shadowJar
+      ./gradlew --no-daemon -g "$GRADLE_USER_HOME" --console=plain --stacktrace --info clean shadowJar
 
       # Pick jar
       JAR="$(ls -1 build/libs/OpenRocket-*.jar | head -n1)"
