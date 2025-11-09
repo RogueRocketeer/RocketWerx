@@ -103,7 +103,7 @@ To this (notice the addition of ``"fi"`` at the end)
    for (String lang : new String[] { "en", "ar", "de", "es", "fr", "it", "nl", "ru", "cs", "pl", "ja", "pt", "tr", "fi" }) {
 
 Finally, add yourself to the list of translation contributors (you deserve some fame! 🙂). This is done in the
-:file:`swing/src/main/java/info/openrocket/swing/gui/dialogs/AboutDialog.java` file.
+:file:`swing/src/main/java/info/openrocket/swing/gui/dialogs/AboutDialog.java` and :file:`README.md` files.
 In this file, edit the String 'CREDITS' and add your details to the list after the 'Translations by:'-tag.
 
 When you are done, create a pull request with your changes. The maintainers will review your changes and merge them if they are.
