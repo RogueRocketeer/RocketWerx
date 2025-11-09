@@ -21,6 +21,7 @@ import info.openrocket.swing.gui.components.UnitSelector;
 import info.openrocket.swing.gui.util.GUIUtil;
 import info.openrocket.swing.gui.theme.UITheme;
 import info.openrocket.core.simulation.RK4SimulationStepper;
+import info.openrocket.core.models.gravity.GravityModelType;
 import info.openrocket.core.unit.UnitGroup;
 import info.openrocket.core.util.GeodeticComputationStrategy;
 
@@ -140,6 +141,67 @@ public class SimulationPreferencesPanel extends PreferencesPanel {
 		gcsTTipListener.actionPerformed(null);
 		subsub.add(gcsCombo, "span 3, wrap");
 
+		// // Gravity model:
+		label = new JLabel(trans.get("simedtdlg.lbl.GravityModel"));
+		label.setToolTipText(trans.get("simedtdlg.lbl.ttip.GravityModel"));
+		subsub.add(label, "gapright para");
+
+		EnumModel<GravityModelType> gravityModelTypeModel = new EnumModel<>(
+				preferences, "GravityModel");
+		final JComboBox<GravityModelType> gravityModelCombo = new JComboBox<>(gravityModelTypeModel);
+		ActionListener gravityModelTTipListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				GravityModelType selectedType = (GravityModelType) gravityModelCombo.getSelectedItem();
+				if (selectedType == GravityModelType.WGS) {
+					gravityModelCombo.setToolTipText(trans.get("simedtdlg.GravityModel.WGS84.ttip"));
+				} else if (selectedType == GravityModelType.CONSTANT) {
+					gravityModelCombo.setToolTipText(trans.get("simedtdlg.GravityModel.Constant.ttip"));
+				}
+			}
+		};
+		gravityModelCombo.addActionListener(gravityModelTTipListener);
+		gravityModelTTipListener.actionPerformed(null);
+		subsub.add(gravityModelCombo, "span 3, wrap");
+
+		// // Constant gravity value:
+		JLabel gravityLabel = new JLabel(trans.get("simedtdlg.lbl.GravityValue"));
+		String gravityTip = trans.get("simedtdlg.lbl.ttip.GravityValue");
+		gravityLabel.setToolTipText(gravityTip);
+		subsub.add(gravityLabel, "gapright para, hidemode 3");
+
+		DoubleModel constantGravityModel = new DoubleModel(preferences, "ConstantGravityValue",
+				UnitGroup.UNITS_ACCELERATION, 0);
+
+		JSpinner gravitySpinner = new JSpinner(constantGravityModel.getSpinnerModel());
+		gravitySpinner.setEditor(new SpinnerEditor(gravitySpinner));
+		gravitySpinner.setToolTipText(gravityTip);
+		subsub.add(gravitySpinner, "hidemode 3");
+
+		UnitSelector gravityUnit = new UnitSelector(constantGravityModel);
+		gravityUnit.setToolTipText(gravityTip);
+		subsub.add(gravityUnit, "hidemode 3");
+
+		BasicSlider gravitySlider = new BasicSlider(constantGravityModel.getSliderModel(0, 20));
+		gravitySlider.setToolTipText(gravityTip);
+		subsub.add(gravitySlider, "w 100, hidemode 3, wrap");
+
+		ActionListener gravityModelVisibilityListener = new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				GravityModelType selectedType = (GravityModelType) gravityModelCombo.getSelectedItem();
+				boolean isConstant = selectedType == GravityModelType.CONSTANT;
+				gravityLabel.setVisible(isConstant);
+				gravitySpinner.setVisible(isConstant);
+				gravityUnit.setVisible(isConstant);
+				gravitySlider.setVisible(isConstant);
+				subsub.revalidate();
+				subsub.repaint();
+			}
+		};
+		gravityModelCombo.addActionListener(gravityModelVisibilityListener);
+		gravityModelVisibilityListener.actionPerformed(null);
+
 
 		// // Time step:
 		label = new JLabel(trans.get("simedtdlg.lbl.Timestep"));
@@ -201,6 +263,9 @@ public class SimulationPreferencesPanel extends PreferencesPanel {
 				m_max.setValue(RK4SimulationStepper.RECOMMENDED_MAX_TIME);
 				gcsModel.setSelectedItem(GeodeticComputationStrategy.SPHERICAL);
 				gcsCombo.repaint();
+				gravityModelTypeModel.setSelectedItem(GravityModelType.WGS);
+				gravityModelCombo.repaint();
+				constantGravityModel.setValue(9.807);
 			}
 		});
 
