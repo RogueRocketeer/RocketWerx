@@ -173,7 +173,6 @@ public class RocketComponentConfig extends JPanel implements Invalidatable, Inva
 		}
 
 		tabbedPane = new JTabbedPane();
-		this.add(tabbedPane, "newline, span, growx, growy 100, wrap");
 		order.add(tabbedPane);
 		tabbedPane.addChangeListener(new ChangeListener() {
 			@Override
@@ -196,6 +195,13 @@ public class RocketComponentConfig extends JPanel implements Invalidatable, Inva
 		//// Comment and Specify a comment for the component
 		tabbedPane.addTab(trans.get("RocketCompCfg.tab.Comment"), null, commentTab(),
 				trans.get("RocketCompCfg.tab.Comment.ttip"));
+
+    JScrollPane scrollPane = new JScrollPane(tabbedPane);
+    scrollPane.setBorder(null);
+    scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+    scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+
+    this.add(scrollPane, "newline, grow, push, wrap");
 
 		addButtons();
 
@@ -269,8 +275,8 @@ public class RocketComponentConfig extends JPanel implements Invalidatable, Inva
 		if (buttonPanel != null) {
 			this.remove(buttonPanel);
 		}
-		
-		buttonPanel = new JPanel(new MigLayout("fill, ins 5, hidemode 3"));
+
+		buttonPanel = new JPanel(new MigLayout("fill, ins 0"));
 
 		//// Component info
 		addComponentInfo(buttonPanel);
@@ -339,8 +345,8 @@ public class RocketComponentConfig extends JPanel implements Invalidatable, Inva
 		buttonPanel.add(okButton);
 
 		updateFields();
-		
-		this.add(buttonPanel, "newline, spanx, growx");
+
+		this.add(buttonPanel, "spanx, growx");
 	}
 
 	protected void disposeDialog() {
@@ -758,7 +764,7 @@ public class RocketComponentConfig extends JPanel implements Invalidatable, Inva
 				Style.BOLD), "wrap");
 		
 		// TODO: LOW:  Changes in comment from other sources not reflected in component
-		commentTextArea = new JTextArea(component.getComment());
+		commentTextArea = new JTextArea(component.getComment(), 5 , 50);
 		commentTextArea.setBorder(marginBorder);
 		commentTextArea.setLineWrap(true);
 		commentTextArea.setWrapStyleWord(true);

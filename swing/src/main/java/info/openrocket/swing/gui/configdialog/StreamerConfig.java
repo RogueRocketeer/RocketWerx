@@ -52,10 +52,10 @@ public class StreamerConfig extends RecoveryDeviceConfig {
 		super(d, component, parent);
 		Streamer streamer = (Streamer) component;
 
-		JPanel primary = new JPanel(new MigLayout());
+		JPanel primary = new JPanel(new MigLayout("fill, ins n n 0 n"));
 
 		//	Left side
-		JPanel panel = new JPanel(new MigLayout("gap rel unrel, ins 0", "[][65lp::][30lp::][]"));
+		JPanel panel = new JPanel(new MigLayout("fillx, ins 0", "[][65lp::][30lp::][]"));
 		
 		//// ---------------------------- Attributes ----------------------------
 
@@ -155,7 +155,7 @@ public class StreamerConfig extends RecoveryDeviceConfig {
 		primary.add(panel, "grow, gapright 20lp");
 
 		//	Right side
-		panel = new JPanel(new MigLayout("ins 0"));
+		panel = new JPanel(new MigLayout("fillx, ins 0"));
 
 
 		{//// ---------------------------- Placement ----------------------------
