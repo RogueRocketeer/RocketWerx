@@ -80,6 +80,15 @@ lib-test/OpenRocket Library Test.iml
 **/build/
 **/.gradle
 
+# IntelliJ run configurations (keep some default configs though)
+!/.idea/runConfigurations/SwingStartup.xml
+!/.idea/runConfigurations/openrocket_jar.xml
+!/.idea/runConfigurations/openrocket_test.xml
+/.idea/runConfigurations/
+
+# VSCode
+.vscode/
+
 # mpeltonen/sbt-idea plugin
 **/.idea_modules/
 
